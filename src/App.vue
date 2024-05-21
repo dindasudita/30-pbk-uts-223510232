@@ -11,56 +11,25 @@
 </header>
 
   <div class="TODOS" id="todos">
-        <h1>TO DO APP DINDA</h1>
-        <input 
-            v-model="taskBaru"
-            type="text"
-            placeholder="Ketik dan Enter"
-            @keyup.enter="typehere" 
-        />
-        
-
-        <select v-model="selected">
-            <option v-for = "option in options" :value="option.value">
-            {{ option.text }}
-            </option>
-        </select>
-
-        <div>{{ tasks.value }}</div>     
-        
-        <ul>
-            <li v-for="(task, index) in tasks" :key="index">
-            <input type="checkbox" v-model="task.completed" />
-            <span>{{ task.text }}</span>
-            <button @click="deleteTask(index)">Hapus</button>
-            </li>
-        </ul>
-
+        <Todos>Hei, ayo kerjakan tugas-tugasmu 📝! {{ msg }}</Todos>
     </div>
 
     <div class="posts" id="posts">
-      <h1>DATA USER</h1>
-      <select v-model="selectedUser">
-        <option v-for="user in users" :key="user.id" :value="user.id">
-        {{ user.name }}
-        </option>
-      </select>
-
-      <h1>POSTS</h1>
-      <p v-if="isLoading">Loading...</p>
-      <ul v-else>
-        <li v-for="post in posts" :key="post.id">
-          {{ post.userId }} - 
-          {{ users.find(user => user.id === post.userId)?.name }} - {{ users.find(user => user.id === post.userId)?.company.name }} - 
-          {{ post.title }} - {{ post.body }}
-        </li>
-      </ul>
+      <Posts 
+      :users="users"
+      :selectedUser="selectedUser"  
+      :posts="posts"
+      :isLoading="isLoading"
+      @select-user="getPost"
+      />
     </div>
 </template>
 
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
+import Todos from './components/Todos.vue'
+import Posts from './components/Posts.vue'
 
 const users = ref([])
 
@@ -68,37 +37,11 @@ const selectedUser = ref(null)
 
 const posts = ref([])
 
-const taskBaru = ref("")
-
 const isLoading = ref(false)
 
-const tasks = ref([
-    { text: 'ambil kain di laundry simpang', completed: false},
-    { text: 'beli sabun cuci piring', completed: true},
-    { text: 'ganti oli mesin sepeda motor', completed: false}
-]);
-
-
-const typehere = () => {
-  if (taskBaru.value.trim() !== "") {
-    tasks.value.push({ text: taskBaru.value, completed: false });
-    taskBaru.value = "";
-  }
-};
-
-const deleteTask = (index) => {
-  tasks.value.splice(index, 1);
-};
-
-
-const selected = ref('Semua')
-
-const options = ref ([
-    { text: 'Selesai', value: true, completed : true},
-    { text: 'Belum Selesai', value: false, completed : false}
-]);
-
-onMounted(() => { });
+onMounted(() => { 
+  getUser()
+});
 
 const getUser = async() => {
   const response = await fetch(`https://jsonplaceholder.typicode.com/users`)
@@ -196,80 +139,9 @@ h1 {
 .TODOS, .posts {
   padding: 20px;
   margin-bottom: 200px;
+  margin-top: 90px;
   overflow-y: auto;
   max-height: 400px;
-}
-
-input[type="text"] {
-    width: 300px;
-    padding: 8px;
-    margin-bottom: 10px;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    color: #903324;
-    padding-left: 10px;
-    padding-right: 10px;
-    text-align: justify;
-        
-}
-
-input[type="checkbox"] {
-    margin-right: 10px;
-}
-
-span {
-    text-decoration: none;
-}
-
-input[type="checkbox"]:checked + span {
-    text-decoration: line-through;
-
-}
-
-button {
-    background-color: #ef8b7a;
-    color: white;
-    border: none;
-    padding: 6px 10px;
-    border-radius: 15px;
-    cursor: pointer;
-    margin-left: auto;
-}
-
-button:hover {
-    background-color: #e36550;
-}
-
-select{
-    background-color: #ef8b7a;
-    margin-left: auto;
-    font-size: medium;
-    border: 25px ;
-    border-radius: 5px;
-}
-
-option{
-    background-color: #fdf4f3;
-    color: #783024;
-}
-
-.posts ul{
-  padding: 0;
-}
-
-.posts li{
-  margin-bottom: 10px;
-  padding-bottom: 10px;
-  text-align: justify;
 }
 
 </style>
